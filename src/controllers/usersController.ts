@@ -20,7 +20,7 @@ const createUser = async (req: Request, res: Response) => {
     });
   }
 
-  const pass = await bcrypt.hashSync(password, "PRIVATEKEY");
+  const pass = await bcrypt.hashSync(password, 8);
 
   const data: IUsers = {
     lastname,
@@ -38,4 +38,10 @@ const createUser = async (req: Request, res: Response) => {
   });
 };
 
-export { createUser };
+const getUsers = async (req: Request, res: Response) => {
+  const Users = await User.find();
+
+  return res.json({ data: Users });
+};
+
+export { createUser, getUsers };

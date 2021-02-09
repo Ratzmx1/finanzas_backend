@@ -29,4 +29,33 @@ const createProfit = async (req: Request, res: Response) => {
   res.json({ message: "Profit created successfully", data: profit });
 };
 
-export { createProfit };
+const getProfits = async (req: Request, res: Response) => {
+  const profits = await Profit.find();
+
+  return res.json({ data: profits });
+};
+
+const updateProfits = async (req: Request, res: Response) => {
+  const { id, type, number, products } = req.body;
+
+  if (
+    !validateStrings(id) ||
+    !validateStrings(type) ||
+    !number ||
+    !validateProduct(products)
+  ) {
+    return res.status(400).json({
+      message: "Bad Request",
+    });
+  }
+  try {
+    await Profit.findByIdAndUpdate(id, { type, number, products });
+    return res.json({ message: "Profit updated successfully" });
+  } catch (error) {
+    return res.status(404).json({
+      message: "Not Found",
+    });
+  }
+};
+
+export { createProfit, getProfits, updateProfits };
