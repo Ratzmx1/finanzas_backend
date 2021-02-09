@@ -2,9 +2,12 @@ import express from "express";
 import mongoose from "mongoose";
 import bodyparser from "body-parser";
 
-import ProductRouter from "./routes/productsRouter";
+// Routes
+import UserRouter from "./routes/usersRouter";
 import ProfitRouter from "./routes/profitsRouter";
+import ProductRouter from "./routes/productsRouter";
 
+// App Configuration
 const app = express();
 const port = process.env.PORT || 8000;
 const dbname = process.env.DBNAME || "test";
@@ -17,8 +20,10 @@ mongoose.connect(mongooseURL, {
 
 app.use(bodyparser.json());
 
-app.use("/products", ProductRouter);
+// App Routers
+app.use("/users", UserRouter);
 app.use("/profits", ProfitRouter);
+app.use("/products", ProductRouter);
 
 app.listen(port, () => {
   console.log(`listen on port ${port}`);
