@@ -28,4 +28,4 @@ const expensesSchema = new Schema({
 
 interface IExpensesExtend extends IExpenses, Document {}
 
-export const Expenses = model<IExpensesExtend>("expenses", expensesSchema);
+export const Expense = model<IExpensesExtend>("expenses", expensesSchema);

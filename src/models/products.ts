@@ -12,4 +12,4 @@ const productsSchema = new Schema({
 
 interface IProductsExtend extends IProducts, Document {}
 
-export const products = model<IProductsExtend>("products", productsSchema);
+export const Product = model<IProductsExtend>("products", productsSchema);

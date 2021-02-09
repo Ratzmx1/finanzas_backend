@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import bodyparser from "body-parser";
 
-import ExampleRouter from "./routes/exampleRoute";
+import ProductRouter from "./routes/productsRouter";
 
 const app = express();
 const port = process.env.PORT || 8000;
@@ -16,7 +16,7 @@ mongoose.connect(mongooseURL, {
 
 app.use(bodyparser.json());
 
-app.use("/example", ExampleRouter);
+app.use("/products", ProductRouter);
 
 app.listen(port, () => {
   console.log(`listen on port ${port}`);

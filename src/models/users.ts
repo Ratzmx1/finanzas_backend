@@ -16,4 +16,4 @@ const usersSchema = new Schema({
 
 interface IUsersExtend extends IUsers, Document {}
 
-export const Expenses = model<IUsersExtend>("expenses", usersSchema);
+export const User = model<IUsersExtend>("users", usersSchema);

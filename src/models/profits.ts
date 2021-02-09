@@ -28,4 +28,4 @@ const profitsSchema = new Schema({
 
 interface IProfitsExtend extends IProfits, Document {}
 
-export const Profits = model<IProfitsExtend>("profits", profitsSchema);
+export const Profit = model<IProfitsExtend>("profits", profitsSchema);
