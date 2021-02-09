@@ -26,4 +26,10 @@ const createProduct = async (req: Request, res: Response) => {
   res.json({ message: "Product created successfully", data: product });
 };
 
-export { createProduct };
+const getProducts = async (req: Request, res: Response) => {
+  const products = await Product.find();
+
+  return res.json({ data: products });
+};
+
+export { createProduct, getProducts };

@@ -6,6 +6,7 @@ import bodyparser from "body-parser";
 import UserRouter from "./routes/usersRouter";
 import ProfitRouter from "./routes/profitsRouter";
 import ExpenseRouter from "./routes/expensesRouter";
+import ProductRouter from "./routes/productsRouter";
 
 // App Configuration
 const app = express();
@@ -24,6 +25,7 @@ app.use(bodyparser.json());
 app.use("/users", UserRouter);
 app.use("/profits", ProfitRouter);
 app.use("/expenses", ExpenseRouter);
+app.use("/products", ProductRouter);
 
 app.listen(port, () => {
   console.log(`listen on port ${port}`);
