@@ -1,4 +1,3 @@
-import { create } from "domain";
 import { Router } from "express";
 
 import { createProduct } from "../controllers/productsController";
