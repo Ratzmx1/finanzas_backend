@@ -1,7 +1,7 @@
 import express from "express";
 import mongoose from "mongoose";
 
-import { Example, IExample } from "./models/exampleModel";
+import ExampleRouter from "./routes/exampleRoute";
 
 const app = express();
 
@@ -16,16 +16,7 @@ mongoose.connect(mongooseURL, {
   useUnifiedTopology: true,
 });
 
-app.get("/", (req, res) => {
-  const data: IExample = {
-    name: "EJEMPLO",
-    fecha: new Date(),
-    productos: [{ name: "wea 1", cantidad: 5 }],
-  };
-  const example = new Example(data);
-  example.save();
-  return res.json({ example });
-});
+app.use("/example", ExampleRouter);
 
 app.listen(port, () => {
   console.log(`listen on port ${port}`);
