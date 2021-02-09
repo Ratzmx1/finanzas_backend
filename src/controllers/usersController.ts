@@ -32,7 +32,7 @@ const createUser = async (req: Request, res: Response) => {
   const user = new User(data);
   await user.save();
 
-  res.json({
+  return res.json({
     message: "User created successfully",
     data: { name: user.name, lastname: user.lastname, rut: user.rut },
   });
