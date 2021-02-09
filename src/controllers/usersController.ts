@@ -38,4 +38,6 @@ const createUser = async (req: Request, res: Response) => {
   });
 };
 
+const changePassword = async (req: Request, res: Response) => {};
+
 export { createUser };
