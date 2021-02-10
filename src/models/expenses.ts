@@ -3,7 +3,8 @@ import { Schema, Document, model } from "mongoose";
 export interface IExpenses {
   provider: string;
   facture: number;
-  date: Date;
+  createdAt: Date;
+  updatedAt?: Date;
   products: [
     {
       name: string;
@@ -16,7 +17,8 @@ export interface IExpenses {
 const expensesSchema = new Schema({
   provider: String,
   facture: Number,
-  date: Date,
+  createdAt: Date,
+  updatedAt: Date,
   products: [
     {
       name: String,

@@ -1,7 +1,8 @@
 import { Schema, Document, model } from "mongoose";
 
 export interface IProfits {
-  date: Date;
+  createdAt: Date;
+  updatedAt?: Date;
   type: string;
   number: number;
   products: [
@@ -14,7 +15,8 @@ export interface IProfits {
 }
 
 const profitsSchema = new Schema({
-  date: Date,
+  createdAt: Date,
+  updatedAt: Date,
   type: String,
   number: Number,
   products: [

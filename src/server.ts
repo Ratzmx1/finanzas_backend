@@ -8,6 +8,8 @@ import ProfitRouter from "./routes/profitsRouter";
 import ExpenseRouter from "./routes/expensesRouter";
 import ProductRouter from "./routes/productsRouter";
 
+import Middleware from "./utils/middleware";
+
 // App Configuration
 const app = express();
 const port = process.env.PORT || 8000;
@@ -23,9 +25,9 @@ app.use(bodyparser.json());
 
 // App Routers
 app.use("/users", UserRouter);
-app.use("/profits", ProfitRouter);
-app.use("/expenses", ExpenseRouter);
-app.use("/products", ProductRouter);
+app.use("/profits", Middleware, ProfitRouter);
+app.use("/expenses", Middleware, ExpenseRouter);
+app.use("/products", Middleware, ProductRouter);
 
 app.listen(port, () => {
   console.log(`listen on port ${port}`);

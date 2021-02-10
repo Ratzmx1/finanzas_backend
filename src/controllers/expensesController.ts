@@ -13,10 +13,10 @@ const createExpenses = async (req: Request, res: Response) => {
     });
   }
 
-  const date = new Date();
+  const createdAt = new Date();
 
   const data: IExpenses = {
-    date,
+    createdAt,
     facture,
     products,
     provider,
@@ -49,7 +49,12 @@ const updateExpenses = async (req: Request, res: Response) => {
     });
   }
   try {
-    await Expense.findByIdAndUpdate(id, { facture, products, provider });
+    await Expense.findByIdAndUpdate(id, {
+      facture,
+      products,
+      provider,
+      updatedAt: new Date(),
+    });
     return res.json({ message: "Expense updated successfully" });
   } catch (error) {
     return res.status(404).json({
