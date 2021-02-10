@@ -3,7 +3,8 @@ import { Schema, Document, model } from "mongoose";
 export interface IExpenses {
   provider: string;
   facture: number;
-  date: Date;
+  createdAt: Date;
+  updatedAt?: Date;
   products: [
     {
       name: string;
@@ -11,12 +12,14 @@ export interface IExpenses {
       price: number;
     }
   ];
+  total: number;
 }
 
 const expensesSchema = new Schema({
   provider: String,
   facture: Number,
-  date: Date,
+  createdAt: Date,
+  updatedAt: Date,
   products: [
     {
       name: String,
@@ -24,6 +27,7 @@ const expensesSchema = new Schema({
       price: Number,
     },
   ],
+  total: Number,
 });
 
 interface IExpensesExtend extends IExpenses, Document {}

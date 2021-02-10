@@ -13,13 +13,22 @@ const createProfit = async (req: Request, res: Response) => {
     });
   }
 
-  const date = new Date();
+  const createdAt = new Date();
+  const updatedAt = new Date();
+
+  let total = 0;
+
+  products.forEach((element: { price: number; quantity: number }) => {
+    total += element.price * element.quantity;
+  });
 
   const data: IProfits = {
-    date,
+    createdAt,
+    updatedAt,
     type,
     number,
     products,
+    total,
   };
 
   const profit = new Profit(data);
@@ -37,6 +46,7 @@ const getProfits = async (req: Request, res: Response) => {
 
 const updateProfits = async (req: Request, res: Response) => {
   const { id, type, number, products } = req.body;
+  const updatedAt = new Date();
 
   if (
     !validateStrings(id) ||
@@ -49,7 +59,7 @@ const updateProfits = async (req: Request, res: Response) => {
     });
   }
   try {
-    await Profit.findByIdAndUpdate(id, { type, number, products });
+    await Profit.findByIdAndUpdate(id, { type, number, products, updatedAt });
     return res.json({ message: "Profit updated successfully" });
   } catch (error) {
     return res.status(404).json({

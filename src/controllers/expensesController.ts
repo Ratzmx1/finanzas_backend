@@ -13,13 +13,21 @@ const createExpenses = async (req: Request, res: Response) => {
     });
   }
 
-  const date = new Date();
+  const createdAt = new Date();
+  const updatedAt = new Date();
+  let total = 0;
+
+  products.forEach((element: { price: number; quantity: number }) => {
+    total += element.price * element.quantity;
+  });
 
   const data: IExpenses = {
-    date,
+    createdAt,
+    updatedAt,
     facture,
     products,
     provider,
+    total,
   };
 
   const Expenses = new Expense(data);
@@ -37,6 +45,7 @@ const getExpenses = async (req: Request, res: Response) => {
 
 const updateExpenses = async (req: Request, res: Response) => {
   const { id, facture, products, provider } = req.body;
+  const updatedAt = new Date();
 
   if (
     !validateStrings(id) ||
@@ -49,7 +58,12 @@ const updateExpenses = async (req: Request, res: Response) => {
     });
   }
   try {
-    await Expense.findByIdAndUpdate(id, { facture, products, provider });
+    await Expense.findByIdAndUpdate(id, {
+      facture,
+      products,
+      provider,
+      updatedAt,
+    });
     return res.json({ message: "Expense updated successfully" });
   } catch (error) {
     return res.status(404).json({
