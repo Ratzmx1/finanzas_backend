@@ -9,7 +9,7 @@ import {
 
 const router = Router();
 
-router.post("/", createUser);
+router.post("/register", createUser);
 router.post("/login", login);
 router.post("/change/password", Middleware, changePassword);
 
