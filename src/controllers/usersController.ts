@@ -39,10 +39,6 @@ const createUser = async (req: Request, res: Response) => {
   });
 };
 
-const changePassword = async (req: Request, res: Response) => {
-  const { password } = req.body;
-};
-
 const login = async (req: Request, res: Response) => {
   const { rut, password } = req.body;
 
@@ -75,10 +71,8 @@ const login = async (req: Request, res: Response) => {
   return res.status(500).json({ message: "Internal Server Error" });
 };
 
-const getUsers = async (req: Request, res: Response) => {
-  const Users = await User.find();
-
-  return res.json({ data: Users });
+const changePassword = async (req: Request, res: Response) => {
+  const { password } = req.body;
 };
 
-export { createUser, getUsers, changePassword, login };
+export { createUser, changePassword, login };

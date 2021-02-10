@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 
 import { validateStrings, validateProduct } from "../utils/functions";
-
 import { IProfits, Profit } from "../models/profits";
 
 const createProfit = async (req: Request, res: Response) => {
@@ -14,7 +13,6 @@ const createProfit = async (req: Request, res: Response) => {
   }
 
   const createdAt = new Date();
-  const updatedAt = new Date();
 
   let total = 0;
 
@@ -24,7 +22,6 @@ const createProfit = async (req: Request, res: Response) => {
 
   const data: IProfits = {
     createdAt,
-    updatedAt,
     type,
     number,
     products,
@@ -38,20 +35,19 @@ const createProfit = async (req: Request, res: Response) => {
   res.json({ message: "Profit created successfully", data: profit });
 };
 
-const getProfits = async (req: Request, res: Response) => {
-  const profits = await Profit.find();
+const getProfit = async (req: Request, res: Response) => {
+  const Profits = await Profit.find();
 
-  return res.json({ data: profits });
+  return res.json({ data: Profits });
 };
 
-const updateProfits = async (req: Request, res: Response) => {
+const updateExpenses = async (req: Request, res: Response) => {
   const { id, type, number, products } = req.body;
-  const updatedAt = new Date();
 
   if (
     !validateStrings(id) ||
-    !validateStrings(type) ||
     !number ||
+    !validateStrings(type) ||
     !validateProduct(products)
   ) {
     return res.status(400).json({
@@ -59,7 +55,13 @@ const updateProfits = async (req: Request, res: Response) => {
     });
   }
   try {
-    await Profit.findByIdAndUpdate(id, { type, number, products, updatedAt });
+    await Profit.findByIdAndUpdate(id, {
+      type,
+      number,
+      products,
+      updatedAt: new Date(),
+    });
+
     return res.json({ message: "Profit updated successfully" });
   } catch (error) {
     return res.status(404).json({
@@ -68,4 +70,4 @@ const updateProfits = async (req: Request, res: Response) => {
   }
 };
 
-export { createProfit, getProfits, updateProfits };
+export { createProfit };

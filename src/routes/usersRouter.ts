@@ -1,8 +1,8 @@
 import { Router } from "express";
+import Middleware from "../utils/middleware";
 
 import {
   createUser,
-  getUsers,
   changePassword,
   login,
 } from "../controllers/usersController";
@@ -10,7 +10,7 @@ import {
 const router = Router();
 
 router.post("/", createUser);
-router.get("/", getUsers);
 router.post("/login", login);
+router.post("/change/password", Middleware, changePassword);
 
 export default router;
