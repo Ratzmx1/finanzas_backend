@@ -1,5 +1,6 @@
 // External Libraries
 import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 
 // Local Modules
@@ -20,7 +21,7 @@ const createUser = async (req: Request, res: Response) => {
     });
   }
 
-  const pass = await bcrypt.hashSync(password, "PRIVATEKEY");
+  const pass = await bcrypt.hashSync(password, 8);
 
   const data: IUsers = {
     lastname,
@@ -38,6 +39,46 @@ const createUser = async (req: Request, res: Response) => {
   });
 };
 
-const changePassword = async (req: Request, res: Response) => {};
+const changePassword = async (req: Request, res: Response) => {
+  const { password } = req.body;
+};
 
-export { createUser };
+const login = async (req: Request, res: Response) => {
+  const { rut, password } = req.body;
+
+  if (!rut) {
+    return res.status(400).json({
+      message: "Bad Request",
+    });
+  }
+
+  const doc = await User.findOne({ rut });
+
+  if (!doc) {
+    return res.status(404).json({ message: "Not Found" });
+  }
+  const result = await bcrypt.compare(password, doc.password);
+
+  if (result) {
+    const token = await jwt.sign(
+      { name: doc.name, lastname: doc.lastname, rut: doc.rut },
+      "PUNTOFERRETEROXD"
+    );
+
+    return res.json({
+      name: doc.name,
+      lastname: doc.lastname,
+      rut: doc.rut,
+      token,
+    });
+  }
+  return res.status(500).json({ message: "Internal Server Error" });
+};
+
+const getUsers = async (req: Request, res: Response) => {
+  const Users = await User.find();
+
+  return res.json({ data: Users });
+};
+
+export { createUser, getUsers, changePassword, login };

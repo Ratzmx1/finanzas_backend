@@ -8,7 +8,10 @@ export interface IUsers {
 }
 
 const usersSchema = new Schema({
-  rut: Number,
+  rut: {
+    type: Number,
+    unique: true,
+  },
   name: String,
   lastname: String,
   password: String,

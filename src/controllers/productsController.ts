@@ -32,4 +32,26 @@ const getProducts = async (req: Request, res: Response) => {
   return res.json({ data: products });
 };
 
-export { createProduct, getProducts };
+const updateProducts = async (req: Request, res: Response) => {
+  const { id, name, type } = req.body;
+
+  if (
+    !validateStrings(id) ||
+    !validateStrings(name) ||
+    !validateStrings(type)
+  ) {
+    return res.status(400).json({
+      message: "Bad Request",
+    });
+  }
+  try {
+    await Product.findByIdAndUpdate(id, { name, type });
+    return res.json({ message: "Product updated successfully" });
+  } catch (error) {
+    return res.status(404).json({
+      message: "Not Found",
+    });
+  }
+};
+
+export { createProduct, getProducts, updateProducts };
