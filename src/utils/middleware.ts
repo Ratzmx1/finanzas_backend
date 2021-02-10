@@ -1,5 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
+import { User } from "../models/users";
+
+interface tokenInterface {
+  name: string;
+  lastname: string;
+  rut: number;
+  id: string;
+}
 
 const middleware = async (req: Request, res: Response, next: NextFunction) => {
   const { authorization } = req.headers;
@@ -17,8 +25,12 @@ const middleware = async (req: Request, res: Response, next: NextFunction) => {
   const token = auth[1];
 
   try {
-    const decoded = jwt.verify(token, "PUNTOFERRETEROXD");
-    req.user = decoded;
+    const decoded = jwt.verify(token, "PUNTOFERRETEROXD") as tokenInterface;
+
+    const user = User.findById(decoded.id);
+
+    req.user = user;
+
     next();
   } catch (error) {
     return res.status(500).json({ message: "Internal server error" });

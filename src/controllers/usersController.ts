@@ -57,7 +57,7 @@ const login = async (req: Request, res: Response) => {
 
   if (result) {
     const token = await jwt.sign(
-      { name: doc.name, lastname: doc.lastname, rut: doc.rut },
+      { name: doc.name, lastname: doc.lastname, rut: doc.rut, id: doc.id },
       "PUNTOFERRETEROXD"
     );
 
@@ -65,6 +65,7 @@ const login = async (req: Request, res: Response) => {
       name: doc.name,
       lastname: doc.lastname,
       rut: doc.rut,
+      id: doc.id,
       token,
     });
   }
@@ -73,6 +74,14 @@ const login = async (req: Request, res: Response) => {
 
 const changePassword = async (req: Request, res: Response) => {
   const { password } = req.body;
+
+  try {
+    const pass = bcrypt.hashSync(password, 8);
+    const user = User.findByIdAndUpdate(req.user.id, { password: pass });
+    return res.json({ message: "Password updated successfully" });
+  } catch (error) {
+    return res.status(404).json({ message: "Not found" });
+  }
 };
 
 export { createUser, changePassword, login };
