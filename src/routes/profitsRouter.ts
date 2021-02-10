@@ -1,15 +1,16 @@
 import { Router } from "express";
+import Middleware from "../utils/middleware";
 
 import {
   createProfit,
-  // getProfits,
-  // updateProfits,
+  getProfit,
+  updateProfit,
 } from "../controllers/profitsController";
 
 const router = Router();
 
-router.post("/", createProfit);
-// router.get("/", getProfits);
-// router.post("/update", updateProfits);
+router.post("/", Middleware, createProfit);
+router.get("/", Middleware, getProfit);
+router.post("/update", Middleware, updateProfit);
 
 export default router;

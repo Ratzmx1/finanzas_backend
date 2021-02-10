@@ -41,7 +41,7 @@ const getProfit = async (req: Request, res: Response) => {
   return res.json({ data: Profits });
 };
 
-const updateExpenses = async (req: Request, res: Response) => {
+const updateProfit = async (req: Request, res: Response) => {
   const { id, type, number, products } = req.body;
 
   if (
@@ -70,4 +70,4 @@ const updateExpenses = async (req: Request, res: Response) => {
   }
 };
 
-export { createProfit };
+export { createProfit, getProfit, updateProfit };

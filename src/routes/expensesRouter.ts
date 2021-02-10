@@ -1,5 +1,7 @@
 import { Router } from "express";
 
+import Middleware from "../utils/middleware";
+
 import {
   createExpenses,
   getExpenses,
@@ -8,8 +10,8 @@ import {
 
 const router = Router();
 
-router.post("/", createExpenses);
-router.get("/", getExpenses);
-router.post("/update", updateExpenses);
+router.post("/", Middleware, createExpenses);
+router.get("/", Middleware, getExpenses);
+router.post("/update", Middleware, updateExpenses);
 
 export default router;

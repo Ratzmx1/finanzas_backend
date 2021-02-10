@@ -25,9 +25,9 @@ app.use(bodyparser.json());
 
 // App Routers
 app.use("/users", UserRouter);
-app.use("/profits", Middleware, ProfitRouter);
-app.use("/expenses", Middleware, ExpenseRouter);
-app.use("/products", Middleware, ProductRouter);
+app.use("/profits", ProfitRouter);
+app.use("/expenses", ExpenseRouter);
+app.use("/products", ProductRouter);
 
 app.listen(port, () => {
   console.log(`listen on port ${port}`);
