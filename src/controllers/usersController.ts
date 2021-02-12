@@ -20,6 +20,14 @@ const createUser = async (req: Request, res: Response) => {
       message: "Bad Request",
     });
   }
+  try {
+    const existe = await User.exists({ rut });
+    if (existe) {
+      return res.status(409).json({ message: "User already created" });
+    }
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
 
   const pass = await bcrypt.hashSync(password, 8);
 
@@ -33,9 +41,22 @@ const createUser = async (req: Request, res: Response) => {
   const user = new User(data);
   await user.save();
 
+  const token = await jwt.sign(
+    { name: user.name, lastname: user.lastname, rut: user.rut, id: user.id },
+    "PUNTOFERRETEROXD",
+    { expiresIn: 60 * 60 * 24 }
+  );
   return res.json({
     message: "User created successfully",
-    data: { name: user.name, lastname: user.lastname, rut: user.rut },
+    data: {
+      user: {
+        name: user.name,
+        lastname: user.lastname,
+        rut: user.rut,
+        id: user.id,
+      },
+      token,
+    },
   });
 };
 
@@ -58,14 +79,17 @@ const login = async (req: Request, res: Response) => {
   if (result) {
     const token = await jwt.sign(
       { name: doc.name, lastname: doc.lastname, rut: doc.rut, id: doc.id },
-      "PUNTOFERRETEROXD"
+      "PUNTOFERRETEROXD",
+      { expiresIn: 60 * 60 * 24 }
     );
 
     return res.json({
-      name: doc.name,
-      lastname: doc.lastname,
-      rut: doc.rut,
-      id: doc.id,
+      user: {
+        name: doc.name,
+        lastname: doc.lastname,
+        rut: doc.rut,
+        id: doc.id,
+      },
       token,
     });
   }
