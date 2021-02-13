@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, Router } from "express";
 
 import { validateStrings, validateProduct } from "../utils/functions";
 import { IProfits, Profit } from "../models/profits";
@@ -20,12 +20,23 @@ const createProfit = async (req: Request, res: Response) => {
     total += element.price * element.quantity;
   });
 
+  function days_passed(dt: Date) {
+    let current = new Date();
+    let previous = new Date(dt.getFullYear(), 0, 1);
+
+    return Math.ceil((current.getTime() - previous.getTime() + 1) / 86400000);
+  }
+
   const data: IProfits = {
     createdAt,
     type,
     number,
     products,
     total,
+    year: createdAt.getFullYear(),
+    weakOfTheYear: Math.floor(days_passed(createdAt) / 7),
+    month: createdAt.getMonth() + 1,
+    day: createdAt.getDate(),
   };
 
   const profit = new Profit(data);
@@ -70,4 +81,67 @@ const updateProfit = async (req: Request, res: Response) => {
   }
 };
 
-export { createProfit, getProfit, updateProfit };
+const profitByMonth = async (req: Request, res: Response) => {
+  const { month } = req.body;
+
+  if (!month) {
+    return res.status(400).json({
+      message: "Bad Request",
+    });
+  }
+
+  try {
+    const p = await Profit.find({ month });
+    return res.json({ profits: p });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const profitByDateRange = async (req: Request, res: Response) => {
+  const { dateI, dateF } = req.body;
+
+  if (!dateI || !dateF) {
+    return res.status(400).json({
+      message: "Bad Request",
+    });
+  }
+  const i = new Date(dateI);
+  const f = new Date(dateF);
+  try {
+    const p = await Profit.find({
+      createdAt: { $gte: i, $lte: f },
+    });
+    return res.json({ profits: p });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const profitByWeek = async (req: Request, res: Response) => {
+  const { week } = req.body;
+
+  if (!week) {
+    return res.status(400).json({
+      message: "Bad Request",
+    });
+  }
+  try {
+    const p = await Profit.find({
+      weakOfTheYear: week,
+    });
+    return res.json({ profits: p });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export {
+  createProfit,
+  getProfit,
+  updateProfit,
+  profitByMonth,
+  profitByDateRange,
+  profitByWeek,
+};
+profitByWeek;

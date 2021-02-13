@@ -5,6 +5,10 @@ export interface IProfits {
   updatedAt?: Date;
   type: string;
   number: number;
+  weakOfTheYear: number;
+  year: number;
+  month: number;
+  day: number;
   products: [
     {
       name: string;
@@ -20,6 +24,10 @@ const profitsSchema = new Schema({
   updatedAt: Date,
   type: String,
   number: Number,
+  weakOfTheYear: Number,
+  year: Number,
+  month: Number,
+  day: Number,
   products: [
     {
       name: String,
