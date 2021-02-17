@@ -20,11 +20,12 @@ const createProfit = async (req: Request, res: Response) => {
     total += element.price * element.quantity;
   });
 
-  function days_passed(dt: Date) {
-    let current = new Date();
-    let previous = new Date(dt.getFullYear(), 0, 1);
-
-    return Math.ceil((current.getTime() - previous.getTime() + 1) / 86400000);
+  function getNumberOfWeek() {
+    const today = new Date();
+    const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
+    const pastDaysOfYear =
+      (today.getTime() - firstDayOfYear.getTime()) / 86400000;
+    return Math.ceil((pastDaysOfYear - firstDayOfYear.getDay() + 1) / 7);
   }
 
   const data: IProfits = {
@@ -34,7 +35,7 @@ const createProfit = async (req: Request, res: Response) => {
     products,
     total,
     year: createdAt.getFullYear(),
-    weakOfTheYear: Math.floor(days_passed(createdAt) / 7),
+    weakOfTheYear: Math.floor(getNumberOfWeek()),
     month: createdAt.getMonth() + 1,
     day: createdAt.getDate(),
   };
@@ -47,9 +48,29 @@ const createProfit = async (req: Request, res: Response) => {
 };
 
 const getProfit = async (req: Request, res: Response) => {
-  const Profits = await Profit.find();
+  try {
+    const Profits = await Profit.find();
+    return res.json({ data: Profits });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
 
-  return res.json({ data: Profits });
+const getProfitId = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  if (id) {
+    try {
+      const Profits = await Profit.findById(id);
+      return res.json({ data: Profits });
+    } catch (error) {
+      console.error(error);
+      return res.status(404).json({ message: "Not Found" });
+    }
+  }
+
+  return res.status(400).json({ message: "Bad Request" });
 };
 
 const updateProfit = async (req: Request, res: Response) => {
@@ -75,6 +96,7 @@ const updateProfit = async (req: Request, res: Response) => {
 
     return res.json({ message: "Profit updated successfully" });
   } catch (error) {
+    console.error(error);
     return res.status(404).json({
       message: "Not Found",
     });
@@ -82,24 +104,27 @@ const updateProfit = async (req: Request, res: Response) => {
 };
 
 const profitByMonth = async (req: Request, res: Response) => {
-  const { month } = req.body;
+  const { data } = req.query;
+  const { month, year } = JSON.parse(data as string);
 
-  if (!month) {
+  if (!month || !year) {
     return res.status(400).json({
       message: "Bad Request",
     });
   }
 
   try {
-    const p = await Profit.find({ month });
+    const p = await Profit.find({ month, year }).sort({ createdAt: -1 });
     return res.json({ profits: p });
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
 
 const profitByDateRange = async (req: Request, res: Response) => {
-  const { dateI, dateF } = req.body;
+  const { data } = req.query;
+  const { dateI, dateF } = JSON.parse(data as string);
 
   if (!dateI || !dateF) {
     return res.status(400).json({
@@ -111,27 +136,31 @@ const profitByDateRange = async (req: Request, res: Response) => {
   try {
     const p = await Profit.find({
       createdAt: { $gte: i, $lte: f },
-    });
+    }).sort({ createdAt: -1 });
     return res.json({ profits: p });
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
 
 const profitByWeek = async (req: Request, res: Response) => {
-  const { week } = req.body;
+  const { data } = req.query;
+  const { week } = JSON.parse(data as string);
 
   if (!week) {
     return res.status(400).json({
       message: "Bad Request",
     });
   }
+
   try {
     const p = await Profit.find({
       weakOfTheYear: week,
-    });
+    }).sort({ createdAt: -1 });
     return res.json({ profits: p });
   } catch (error) {
+    console.error(error);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -143,4 +172,5 @@ export {
   profitByMonth,
   profitByDateRange,
   profitByWeek,
+  getProfitId,
 };
