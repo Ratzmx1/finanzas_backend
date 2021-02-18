@@ -5,6 +5,10 @@ export interface IExpenses {
   facture: number;
   createdAt: Date;
   updatedAt?: Date;
+  weakOfTheYear: number;
+  year: number;
+  month: number;
+  day: number;
   products: [
     {
       name: string;
@@ -20,6 +24,10 @@ const expensesSchema = new Schema({
   facture: Number,
   createdAt: Date,
   updatedAt: Date,
+  weakOfTheYear: Number,
+  year: Number,
+  month: Number,
+  day: Number,
   products: [
     {
       name: String,

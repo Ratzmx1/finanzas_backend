@@ -20,12 +20,24 @@ const createExpenses = async (req: Request, res: Response) => {
     total += element.price * element.quantity;
   });
 
+  function getNumberOfWeek() {
+    const today = new Date();
+    const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
+    const pastDaysOfYear =
+      (today.getTime() - firstDayOfYear.getTime()) / 86400000;
+    return Math.ceil((pastDaysOfYear - firstDayOfYear.getDay() + 1) / 7);
+  }
+
   const data: IExpenses = {
     createdAt,
     facture,
     products,
     provider,
     total,
+    year: createdAt.getFullYear(),
+    weakOfTheYear: Math.floor(getNumberOfWeek()),
+    month: createdAt.getMonth() + 1,
+    day: createdAt.getDate(),
   };
 
   const Expenses = new Expense(data);
@@ -36,7 +48,7 @@ const createExpenses = async (req: Request, res: Response) => {
 };
 
 const getExpenses = async (req: Request, res: Response) => {
-  const Expenses = await Expense.find();
+  const Expenses = await Expense.find().sort({ createdAt: -1 });
 
   return res.json({ data: Expenses });
 };
@@ -69,4 +81,92 @@ const updateExpenses = async (req: Request, res: Response) => {
   }
 };
 
-export { createExpenses, getExpenses, updateExpenses };
+////////////////////
+
+const geExpenseId = async (req: Request, res: Response) => {
+  const { id } = req.params;
+
+  if (id) {
+    try {
+      const data = await Expense.findById(id);
+      return res.json({ data });
+    } catch (error) {
+      console.error(error);
+      return res.status(404).json({ message: "Not Found" });
+    }
+  }
+
+  return res.status(400).json({ message: "Bad Request" });
+};
+
+const expenseByMonth = async (req: Request, res: Response) => {
+  const { data } = req.query;
+  const { month, year } = JSON.parse(data as string);
+
+  if (!month || !year) {
+    return res.status(400).json({
+      message: "Bad Request",
+    });
+  }
+
+  try {
+    const p = await Expense.find({ month, year }).sort({ createdAt: -1 });
+    return res.json({ data: p });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const expensesByDateRange = async (req: Request, res: Response) => {
+  const { data } = req.query;
+  const { dateI, dateF } = JSON.parse(data as string);
+
+  if (!dateI || !dateF) {
+    return res.status(400).json({
+      message: "Bad Request",
+    });
+  }
+  const i = new Date(dateI);
+  const f = new Date(dateF);
+  try {
+    const p = await Expense.find({
+      createdAt: { $gte: i, $lte: f },
+    }).sort({ createdAt: -1 });
+    return res.json({ data: p });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const expensesByWeek = async (req: Request, res: Response) => {
+  const { data } = req.query;
+  const { week } = JSON.parse(data as string);
+
+  if (!week) {
+    return res.status(400).json({
+      message: "Bad Request",
+    });
+  }
+
+  try {
+    const p = await Expense.find({
+      weakOfTheYear: week,
+    }).sort({ createdAt: -1 });
+    return res.json({ data: p });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export {
+  createExpenses,
+  getExpenses,
+  updateExpenses,
+  expensesByDateRange,
+  expensesByWeek,
+  geExpenseId,
+  expenseByMonth,
+};
