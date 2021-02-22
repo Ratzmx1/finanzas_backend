@@ -28,7 +28,7 @@
   "scripts": {
     "dev": "nodemon src/server.ts",
     "start": "node dist/index.js",
-    "preinstall": "tsc",
+    "postinstall": "tsc",
     "watch-node": "nodemon dist/index.js",
     "watch-ts": "tsc -w",
     "deploy": "git add . && git commit -m Heroku && git push heroku master"
