@@ -15,7 +15,7 @@ import Middleware from "./utils/middleware";
 // App Configuration
 const app = express();
 const port = process.env.PORT || 8000;
-const dbname = process.env.DBNAME || "test";
+const dbname = process.env.DBNAME || "prod";
 const mongooseURL = `mongodb+srv://admin:admin@cluster0.y28gj.mongodb.net/${dbname}?retryWrites=true&w=majority`;
 
 mongoose.connect(mongooseURL, {
