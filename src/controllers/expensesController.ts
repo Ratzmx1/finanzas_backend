@@ -5,7 +5,7 @@ import { validateStrings, validateProduct } from "../utils/functions";
 import { IExpenses, Expense } from "../models/expenses";
 
 const createExpenses = async (req: Request, res: Response) => {
-  const { facture, products, provider } = req.body;
+  const { facture, products, provider, description } = req.body;
 
   if (!facture || !validateStrings(provider) || !validateProduct(products)) {
     return res.status(400).json({
@@ -34,6 +34,7 @@ const createExpenses = async (req: Request, res: Response) => {
     products,
     provider,
     total,
+    description: description || "",
     year: createdAt.getFullYear(),
     weakOfTheYear: Math.floor(getNumberOfWeek()),
     month: createdAt.getMonth() + 1,
@@ -161,6 +162,17 @@ const expensesByWeek = async (req: Request, res: Response) => {
   }
 };
 
+const deleteExpense = async (req: Request, res: Response) => {
+  const { id } = req.body;
+
+  try {
+    await Expense.findByIdAndDelete(id);
+    return res.json({});
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export {
   createExpenses,
   getExpenses,
@@ -169,4 +181,5 @@ export {
   expensesByWeek,
   geExpenseId,
   expenseByMonth,
+  deleteExpense,
 };

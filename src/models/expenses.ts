@@ -9,6 +9,7 @@ export interface IExpenses {
   year: number;
   month: number;
   day: number;
+  description: string;
   products: [
     {
       name: string;
@@ -28,6 +29,7 @@ const expensesSchema = new Schema({
   year: Number,
   month: Number,
   day: Number,
+  description: { type: String, default: "" },
   products: [
     {
       name: String,

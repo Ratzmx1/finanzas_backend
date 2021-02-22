@@ -9,6 +9,7 @@ export interface IProfits {
   year: number;
   month: number;
   day: number;
+  description?: string;
   products: [
     {
       name: string;
@@ -17,6 +18,7 @@ export interface IProfits {
     }
   ];
   total: number;
+  percentage?: number;
 }
 
 const profitsSchema = new Schema({
@@ -28,6 +30,7 @@ const profitsSchema = new Schema({
   year: Number,
   month: Number,
   day: Number,
+  description: { type: String, default: "" },
   products: [
     {
       name: String,

@@ -1,10 +1,10 @@
-import { Request, Response, Router } from "express";
+import { request, Request, Response, Router } from "express";
 
 import { validateStrings, validateProduct } from "../utils/functions";
 import { IProfits, Profit } from "../models/profits";
 
 const createProfit = async (req: Request, res: Response) => {
-  const { type, number, products } = req.body;
+  const { type, number, products, description } = req.body;
 
   if (!number || !validateStrings(type) || !validateProduct(products)) {
     return res.status(400).json({
@@ -34,6 +34,7 @@ const createProfit = async (req: Request, res: Response) => {
     number,
     products,
     total,
+    description: description || "",
     year: createdAt.getFullYear(),
     weakOfTheYear: Math.floor(getNumberOfWeek()),
     month: createdAt.getMonth() + 1,
@@ -49,7 +50,7 @@ const createProfit = async (req: Request, res: Response) => {
 
 const getProfit = async (req: Request, res: Response) => {
   try {
-    const Profits = await Profit.find();
+    const Profits = await Profit.find().sort({ createdAt: -1 }).limit(50);
     return res.json({ data: Profits });
   } catch (error) {
     console.error(error);
@@ -100,6 +101,17 @@ const updateProfit = async (req: Request, res: Response) => {
     return res.status(404).json({
       message: "Not Found",
     });
+  }
+};
+
+const deleteProfit = async (req: Request, res: Response) => {
+  const { id } = req.body;
+
+  try {
+    await Profit.findByIdAndDelete(id);
+    return res.json({});
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
@@ -173,4 +185,5 @@ export {
   profitByDateRange,
   profitByWeek,
   getProfitId,
+  deleteProfit,
 };

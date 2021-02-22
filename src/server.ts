@@ -5,6 +5,7 @@ import bodyparser from "body-parser";
 
 // Routes
 import UserRouter from "./routes/usersRouter";
+import ChartRouter from "./routes/chartsRouter";
 import ProfitRouter from "./routes/profitsRouter";
 import ExpenseRouter from "./routes/expensesRouter";
 import ProductRouter from "./routes/productsRouter";
@@ -30,6 +31,7 @@ app.use("/users", UserRouter);
 app.use("/profits", ProfitRouter);
 app.use("/expenses", ExpenseRouter);
 app.use("/products", ProductRouter);
+app.use("/charts", ChartRouter);
 
 app.listen(port, () => {
   console.log(`listen on port ${port}`);
