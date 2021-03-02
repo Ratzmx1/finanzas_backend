@@ -1,6 +1,10 @@
 import { Schema, Document, model } from "mongoose";
 
 export interface IExpenses {
+  expenseType: string;
+  documentType: string;
+  paymentType: string;
+  paymentDate?: Date;
   provider: string;
   facture: number;
   createdAt: Date;
@@ -21,6 +25,10 @@ export interface IExpenses {
 }
 
 const expensesSchema = new Schema({
+  expenseType: String,
+  documentType: String,
+  paymentType: String,
+  paymentDate: String,
   provider: String,
   facture: Number,
   createdAt: Date,

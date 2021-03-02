@@ -3,8 +3,15 @@ import { request, Request, Response, Router } from "express";
 import { validateStrings, validateProduct } from "../utils/functions";
 import { IProfits, Profit } from "../models/profits";
 
+import { getNumberOfWeek } from "../utils/functions";
+
 const createProfit = async (req: Request, res: Response) => {
   const { type, number, products, description } = req.body;
+  let { date } = req.body;
+
+  if (!date) {
+    date = new Date();
+  }
 
   if (!number || !validateStrings(type) || !validateProduct(products)) {
     return res.status(400).json({
@@ -12,21 +19,12 @@ const createProfit = async (req: Request, res: Response) => {
     });
   }
 
-  const createdAt = new Date();
-
+  const createdAt = date;
   let total = 0;
 
   products.forEach((element: { price: number; quantity: number }) => {
     total += element.price * element.quantity;
   });
-
-  function getNumberOfWeek() {
-    const today = new Date();
-    const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
-    const pastDaysOfYear =
-      (today.getTime() - firstDayOfYear.getTime()) / 86400000;
-    return Math.ceil((pastDaysOfYear - firstDayOfYear.getDay() + 1) / 7);
-  }
 
   const data: IProfits = {
     createdAt,
@@ -36,7 +34,7 @@ const createProfit = async (req: Request, res: Response) => {
     total,
     description: description || "",
     year: createdAt.getFullYear(),
-    weakOfTheYear: Math.floor(getNumberOfWeek()),
+    weakOfTheYear: Math.floor(getNumberOfWeek(createdAt)),
     month: createdAt.getMonth() + 1,
     day: createdAt.getDate(),
   };

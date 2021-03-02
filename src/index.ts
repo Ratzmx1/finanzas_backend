@@ -5,12 +5,11 @@ import bodyparser from "body-parser";
 
 // Routes
 import UserRouter from "./routes/usersRouter";
+import CashRouter from "./routes/cashRouter";
 import ChartRouter from "./routes/chartsRouter";
 import ProfitRouter from "./routes/profitsRouter";
 import ExpenseRouter from "./routes/expensesRouter";
 import ProductRouter from "./routes/productsRouter";
-
-import Middleware from "./utils/middleware";
 
 // App Configuration
 const app = express();
@@ -27,12 +26,15 @@ app.use(bodyparser.json());
 app.use(cors());
 
 // App Routers
+app.use("/cash", CashRouter);
 app.use("/users", UserRouter);
+app.use("/charts", ChartRouter);
 app.use("/profits", ProfitRouter);
 app.use("/expenses", ExpenseRouter);
 app.use("/products", ProductRouter);
-app.use("/charts", ChartRouter);
 
 app.listen(port, () => {
   console.log(`listen on port ${port}`);
 });
+
+//TODO: Gestion de caja (Tipo saldo banco)

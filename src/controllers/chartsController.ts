@@ -14,6 +14,7 @@ const getPercentage = async (req: Request, res: Response) => {
     ];
     const keys: Array<string> = ["Gasto"];
     let tot = 0;
+    console.log(prof)
     prof.forEach((it) => {
       if (!keys.includes(it.type)) {
         total.push({ type: it.type, total: 0 });

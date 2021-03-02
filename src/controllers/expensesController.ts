@@ -4,31 +4,49 @@ import { validateStrings, validateProduct } from "../utils/functions";
 
 import { IExpenses, Expense } from "../models/expenses";
 
-const createExpenses = async (req: Request, res: Response) => {
-  const { facture, products, provider, description } = req.body;
+import { getNumberOfWeek } from "../utils/functions";
 
-  if (!facture || !validateStrings(provider) || !validateProduct(products)) {
+const createExpenses = async (req: Request, res: Response) => {
+  const {
+    documentType,
+    facture,
+    products,
+    provider,
+    description,
+    expenseType,
+    paymentType,
+    paymentDate,
+  } = req.body;
+
+  let { date } = req.body;
+
+  if (
+    !facture ||
+    !validateStrings(provider) ||
+    !validateProduct(products) ||
+    !validateStrings(paymentType) ||
+    !validateStrings(expenseType) ||
+    !validateStrings(documentType)
+  ) {
     return res.status(400).json({
       message: "Bad Request",
     });
   }
 
-  const createdAt = new Date();
+  if (!date) date = new Date();
+
+  const createdAt = date;
   let total = 0;
 
   products.forEach((element: { price: number; quantity: number }) => {
     total += element.price * element.quantity;
   });
 
-  function getNumberOfWeek() {
-    const today = new Date();
-    const firstDayOfYear = new Date(today.getFullYear(), 0, 1);
-    const pastDaysOfYear =
-      (today.getTime() - firstDayOfYear.getTime()) / 86400000;
-    return Math.ceil((pastDaysOfYear - firstDayOfYear.getDay() + 1) / 7);
-  }
-
   const data: IExpenses = {
+    documentType,
+    expenseType,
+    paymentDate: paymentDate,
+    paymentType,
     createdAt,
     facture,
     products,
@@ -36,7 +54,7 @@ const createExpenses = async (req: Request, res: Response) => {
     total,
     description: description || "",
     year: createdAt.getFullYear(),
-    weakOfTheYear: Math.floor(getNumberOfWeek()),
+    weakOfTheYear: Math.floor(getNumberOfWeek(createdAt)),
     month: createdAt.getMonth() + 1,
     day: createdAt.getDate(),
   };
@@ -48,11 +66,15 @@ const createExpenses = async (req: Request, res: Response) => {
   res.json({ message: "Expenses created successfully", data: Expenses });
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 const getExpenses = async (req: Request, res: Response) => {
   const Expenses = await Expense.find().sort({ createdAt: -1 });
 
   return res.json({ data: Expenses });
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const updateExpenses = async (req: Request, res: Response) => {
   const { id, facture, products, provider } = req.body;
@@ -82,7 +104,7 @@ const updateExpenses = async (req: Request, res: Response) => {
   }
 };
 
-////////////////////
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const geExpenseId = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -99,6 +121,8 @@ const geExpenseId = async (req: Request, res: Response) => {
 
   return res.status(400).json({ message: "Bad Request" });
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const expenseByMonth = async (req: Request, res: Response) => {
   const { data } = req.query;
@@ -118,6 +142,8 @@ const expenseByMonth = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const expensesByDateRange = async (req: Request, res: Response) => {
   const { data } = req.query;
@@ -141,6 +167,8 @@ const expensesByDateRange = async (req: Request, res: Response) => {
   }
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 const expensesByWeek = async (req: Request, res: Response) => {
   const { data } = req.query;
   const { week } = JSON.parse(data as string);
@@ -161,6 +189,8 @@ const expensesByWeek = async (req: Request, res: Response) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 const deleteExpense = async (req: Request, res: Response) => {
   const { id } = req.body;
