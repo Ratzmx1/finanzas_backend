@@ -1,4 +1,4 @@
-import { request, Request, Response, Router } from "express";
+import { Request, Response } from "express";
 
 import { validateStrings, validateProduct } from "../utils/functions";
 import { IProfits, Profit } from "../models/profits";
@@ -13,13 +13,13 @@ const createProfit = async (req: Request, res: Response) => {
     date = new Date();
   }
 
-  if (!number || !validateStrings(type) || !validateProduct(products)) {
+  if (!validateStrings(type) || !validateProduct(products)) {
     return res.status(400).json({
       message: "Bad Request",
     });
   }
 
-  const createdAt = date;
+  const createdAt = new Date(date);
   let total = 0;
 
   products.forEach((element: { price: number; quantity: number }) => {
@@ -38,7 +38,7 @@ const createProfit = async (req: Request, res: Response) => {
     month: createdAt.getMonth() + 1,
     day: createdAt.getDate(),
   };
-
+  console.log(data);
   const profit = new Profit(data);
 
   await profit.save();
