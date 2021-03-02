@@ -36,5 +36,3 @@ app.use("/products", ProductRouter);
 app.listen(port, () => {
   console.log(`listen on port ${port}`);
 });
-
-//TODO: Gestion de caja (Tipo saldo banco)
