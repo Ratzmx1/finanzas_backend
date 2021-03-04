@@ -7,6 +7,10 @@ export interface ICash {
   description: string;
   abono?: number;
   cargo?: number;
+  weakOfTheYear: number;
+  year: number;
+  month: number;
+  day: number;
 }
 
 const cashSchema = new Schema({
@@ -16,6 +20,10 @@ const cashSchema = new Schema({
   description: String,
   abono: { type: Number, default: 0 },
   cargo: { type: Number, default: 0 },
+  weakOfTheYear: Number,
+  year: Number,
+  month: Number,
+  day: Number,
 });
 
 interface ICashExtended extends ICash, Document {}

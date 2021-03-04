@@ -8,7 +8,6 @@ export interface IExpenses {
   provider: string;
   facture: number;
   createdAt: Date;
-  updatedAt?: Date;
   weakOfTheYear: number;
   year: number;
   month: number;
