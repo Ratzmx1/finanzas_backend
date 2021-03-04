@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 
 import { validateStrings, validateProduct } from "../utils/functions";
 import { IProfits, Profit } from "../models/profits";
+import { Balance, IBalance } from "../models/balance";
 
 import { getNumberOfWeek } from "../utils/functions";
 
@@ -38,12 +39,28 @@ const createProfit = async (req: Request, res: Response) => {
     month: createdAt.getMonth() + 1,
     day: createdAt.getDate(),
   };
-  console.log(data);
   const profit = new Profit(data);
+  try {
+    await profit.save();
+    let bal = await Balance.findOne({
+      month: createdAt.getMonth() + 1,
+      year: createdAt.getFullYear(),
+    });
 
-  await profit.save();
-
-  res.json({ message: "Profit created successfully", data: profit });
+    if (!bal) {
+      bal = await Balance.create({
+        month: createdAt.getMonth() + 1,
+        year: createdAt.getFullYear(),
+        total,
+      });
+    } else {
+      await bal.update({ total: bal.total + total });
+      await bal.save();
+    }
+    return res.json({ message: "Profit created successfully", data: profit });
+  } catch (error) {
+    return res.status(500).json({ message: error.message });
+  }
 };
 
 const getProfit = async (req: Request, res: Response) => {

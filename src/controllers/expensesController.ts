@@ -3,37 +3,38 @@ import { Request, Response } from "express";
 import { validateStrings, validateProduct } from "../utils/functions";
 
 import { IExpenses, Expense } from "../models/expenses";
+import { Balance, IBalance } from "../models/balance";
 
 import { getNumberOfWeek } from "../utils/functions";
 
 const createExpenses = async (req: Request, res: Response) => {
   const {
+    provider,
     documentType,
     facture,
-    products,
-    provider,
-    description,
     expenseType,
     paymentType,
     paymentDate,
+    description,
+    products,
   } = req.body;
 
   let { date } = req.body;
 
   if (
-    !facture ||
     !validateStrings(provider) ||
     !validateProduct(products) ||
     !validateStrings(paymentType) ||
     !validateStrings(expenseType) ||
-    !validateStrings(documentType)
+    !validateStrings(documentType) ||
+    products.length < 1
   ) {
     return res.status(400).json({
       message: "Bad Request",
     });
   }
 
-  if (!date) date = new Date();
+  date = new Date(date);
 
   const createdAt = date;
   let total = 0;
@@ -59,11 +60,33 @@ const createExpenses = async (req: Request, res: Response) => {
     day: createdAt.getDate(),
   };
 
-  const Expenses = new Expense(data);
+  const expense = new Expense(data);
+  try {
+    await expense.save();
 
-  await Expenses.save();
+    let bal = await Balance.findOne({
+      month: createdAt.getMonth() + 1,
+      year: createdAt.getFullYear(),
+    });
 
-  res.json({ message: "Expenses created successfully", data: Expenses });
+    if (!bal) {
+      bal = await Balance.create({
+        month: createdAt.getMonth() + 1,
+        year: createdAt.getFullYear(),
+        total: -total,
+      });
+    } else {
+      await bal.update({ total: bal.total - total });
+      await bal.save();
+    }
+    return res.json({
+      message: "Expenses created successfully",
+      data: expense,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -203,6 +226,22 @@ const deleteExpense = async (req: Request, res: Response) => {
   }
 };
 
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+const markAsPaid = async (req: Request, res: Response) => {
+  const { id } = req.body;
+
+  try {
+    const expense = await Expense.findById(id);
+    expense?.set("paymentDate", undefined, { strict: false });
+
+    await expense?.save();
+    return res.json({ expense });
+  } catch (error) {
+    return res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export {
   createExpenses,
   getExpenses,
@@ -212,4 +251,5 @@ export {
   geExpenseId,
   expenseByMonth,
   deleteExpense,
+  markAsPaid,
 };

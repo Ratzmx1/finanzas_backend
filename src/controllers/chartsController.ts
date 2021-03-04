@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Profit, IProfits } from "../models/profits";
 import { Expense, IExpenses } from "../models/expenses";
+import { Balance } from "../models/balance";
 
 const getPercentage = async (req: Request, res: Response) => {
   const month = new Date().getMonth() + 1;
@@ -14,7 +15,6 @@ const getPercentage = async (req: Request, res: Response) => {
     ];
     const keys: Array<string> = ["Gasto"];
     let tot = 0;
-    console.log(prof)
     prof.forEach((it) => {
       if (!keys.includes(it.type)) {
         total.push({ type: it.type, total: 0 });
@@ -44,30 +44,14 @@ const getLast11Months = async (req: Request, res: Response) => {
   const now = new Date();
   let prev = new Date(now.getFullYear() - 1, now.getMonth() + 2, 0);
   let results: Array<{ date: Date; total: number }> = [];
-  let total: number;
   try {
     for (let i = 0; i < 12; i++) {
-      total = 0;
-
-      const prof = await Profit.find({
+      const bal = await Balance.findOne({
         month: prev.getMonth() + 1,
         year: prev.getFullYear(),
       });
 
-      prof.forEach((e) => {
-        total += e.total;
-      });
-
-      const exp = await Expense.find({
-        month: prev.getMonth() + 1,
-        year: prev.getFullYear(),
-      });
-
-      exp.forEach((e) => {
-        total -= e.total;
-      });
-
-      results.push({ date: prev, total });
+      results.push({ date: prev, total: bal?.total || 0 });
 
       prev = new Date(prev.getFullYear(), prev.getMonth() + 2, 0);
     }

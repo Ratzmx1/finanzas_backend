@@ -4,7 +4,7 @@ export interface IExpenses {
   expenseType: string;
   documentType: string;
   paymentType: string;
-  paymentDate?: Date;
+  paymentDate: Date;
   provider: string;
   facture: number;
   createdAt: Date;
