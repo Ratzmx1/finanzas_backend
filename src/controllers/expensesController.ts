@@ -6,6 +6,7 @@ import { IExpenses, Expense } from "../models/expenses";
 import { Balance, IBalance } from "../models/balance";
 
 import { getNumberOfWeek } from "../utils/functions";
+import { Cash } from "../models/cash";
 
 const createExpenses = async (req: Request, res: Response) => {
   const {
@@ -112,11 +113,19 @@ const updateExpenses = async (req: Request, res: Response) => {
       message: "Bad Request",
     });
   }
+
+  let total = 0;
+
+  products.forEach((element: { price: number; quantity: number }) => {
+    total += element.price * element.quantity;
+  });
+
   try {
     await Expense.findByIdAndUpdate(id, {
       facture,
       products,
       provider,
+      total,
       updatedAt: new Date(),
     });
     return res.json({ message: "Expense updated successfully" });
@@ -219,7 +228,20 @@ const deleteExpense = async (req: Request, res: Response) => {
   const { id } = req.body;
 
   try {
+    const expense = await Expense.findById(id);
+
+    const total = expense?.total || 0;
+
+    let bal = await Balance.findOne({
+      month: expense?.month,
+      year: expense?.year,
+    });
+
     await Expense.findByIdAndDelete(id);
+    await bal?.update({
+      total: bal.total + total,
+    });
+
     return res.json({});
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });

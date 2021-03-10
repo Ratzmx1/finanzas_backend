@@ -42,6 +42,7 @@ const createProfit = async (req: Request, res: Response) => {
   const profit = new Profit(data);
   try {
     await profit.save();
+
     let bal = await Balance.findOne({
       month: createdAt.getMonth() + 1,
       year: createdAt.getFullYear(),
@@ -123,7 +124,17 @@ const deleteProfit = async (req: Request, res: Response) => {
   const { id } = req.body;
 
   try {
+    const profit = await Profit.findById(id);
+    const total = profit?.total || 0;
+    let bal = await Balance.findOne({
+      month: profit?.month,
+      year: profit?.year,
+    });
+
     await Profit.findByIdAndDelete(id);
+    await bal?.update({
+      total: bal.total + total,
+    });
     return res.json({});
   } catch (error) {
     return res.status(500).json({ message: "Internal Server Error" });
